@@ -1,0 +1,50 @@
+---
+title: "DDP Week 4 Course Project"
+author: "Fergus Meade"
+date: "10/25/2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr); library(pxR); library(ggplot2)
+```
+
+## Overview
+The goal is to create a simple shiny application to allow a user to examine changes in crop value/output in Ireland over time. Data on agricultural output is obtained from Ireland's Central Statistics Office and filtered for crop data only.
+
+The app allows the user to plot individual lines from the plot on slide 5 i.e. select a crop of interest.
+
+## Data set
+
+```{r data, echo = TRUE, warning=FALSE, message=FALSE}
+url <- "http://www.cso.ie/px/pxeirestat/Database/Eirestat/Regional%20Accounts/ACA03.px"
+ACA03df <- as.data.frame(read.px(url))
+head(levels(ACA03df$Statistic)) #dataset contains 40 measures of agri output
+levels(ACA03df$Year) #over the period 2010-2017
+Crops <- ACA03df %>% 
+    filter(Statistic %in% levels(ACA03df$Statistic)[10:16]) %>% #restrict to data about crops
+    filter(Region == "State") #ignore regional data
+```
+
+## Retrieve information related to Crops
+
+- Shiny app : https://fergusmeade.shinyapps.io/Crops_fm/
+- Code : 
+- Pitch :
+
+-Input Panel: Select your crop group of interest
+-Ouput Panel: A time series plot showing the change in value of the crop over time
+
+## Plot
+
+This plot obscures the growth in the value of fresh fruit and vegetable crops in recent years because these crops are still dwarved by forage. 
+
+```{r echo=FALSE}
+library(ggplot2)
+ggplot(Crops, aes(x = Year, y = value, 
+                  group = Statistic, colour = Statistic)) + 
+  geom_line() + ylab(label="Millions of Euro") + xlab("Year") +
+  theme_minimal()
+```
+
